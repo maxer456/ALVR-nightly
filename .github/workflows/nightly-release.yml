@@ -86,6 +86,7 @@ jobs:
         run: |
           mklink /J "%GITHUB_WORKSPACE%\android-sdk" "%ANDROID_SDK_ROOT%"
       - name: Build and package ALVR (.zip, .pdb, .apk, .msi)
+        id: build
         env:
           ANDROID_HOME: '${{ github.workspace }}\android-sdk'
           ANDROID_SDK_ROOT: '${{ github.workspace }}\android-sdk'
@@ -93,6 +94,8 @@ jobs:
           cargo xtask install-deps
           cargo xtask bump-versions --nightly
           cargo xtask publish
+          $file = Get-ChildItem -Name .\build\*.msi | Select-Object -f 1
+          echo "::set-output name=msi_filename::$file"
       # Three release asset upload actions for three assets - .zip, .pdb and .apk
       - name: Upload ALVR Windows Server .zip
         uses: actions/upload-release-asset@v1
@@ -121,20 +124,14 @@ jobs:
           asset_path: ./build/alvr_client.apk
           asset_name: alvr_client.apk
           asset_content_type: application/vnd.android.package-archive
-      - name: Get installer filename
-        id: get_installer_filename
-        run: |
-          $file = Get-ChildItem -Name .\build\*.msi | Select-Object -f 1
-          echo "::set-output name=filename::$file"
-          echo "Found filename: $file"
       - name: Upload Windows MSI Installer
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.prepare_release.outputs.upload_url }}
-          asset_path: ./build/${{ steps.get_installer_filename.filename }}
-          asset_name: ${{ steps.get_installer_filename.filename }}
+          asset_path: ./build/${{ steps.build.outputs.msi_filename }}
+          asset_name: ${{ steps.build.outputs.msi_filename }}
           asset_content_type: application/octet-stream
           
   publish_release:
