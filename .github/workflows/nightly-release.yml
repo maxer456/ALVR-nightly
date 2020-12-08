@@ -124,7 +124,7 @@ jobs:
       - name: Get installer filename
         id: get_installer_filename
         run: |
-          '$file = Get-ChildItem -Name .\build\*.msi | Select-Object -f 1'
+          $file = Get-ChildItem -Name .\build\*.msi | Select-Object -f 1
           echo "::set-output name=filename::$file"
           echo "Found filename: $file"
       - name: Upload Windows MSI Installer
