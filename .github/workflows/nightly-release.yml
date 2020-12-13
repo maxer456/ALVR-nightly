@@ -93,7 +93,7 @@ jobs:
       - name: Download WiX 3.14 binaries
         if: steps.cache_wix.outputs.cache-hit != 'true'
         run: |
-          Invoke-WebRequest https://wixtoolset.org/downloads/v3.14.0.4118/wix314-binaries.zip -OutFile wix314-binaries.zip
+          Invoke-WebRequest http://static.wixtoolset.org/releases/v3.14.0.4118/wix314-binaries.zip -OutFile wix314-binaries.zip
           Expand-Archive -Path wix314-binaries.zip -DestinationPath wix314-binaries/bin
 
       - name: Set better Android SDK path (workaround for rust-android-gradle)
